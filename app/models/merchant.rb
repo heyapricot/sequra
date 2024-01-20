@@ -8,4 +8,7 @@ class Merchant < ApplicationRecord
     :reference
 
   validates_numericality_of :minimum_monthly_fee, greater_than_or_equal_to: 0
+
+  has_many :disbursements
+  has_many :orders
 end
