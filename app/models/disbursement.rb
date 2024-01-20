@@ -6,7 +6,9 @@ class Disbursement < ApplicationRecord
   validates_numericality_of :merchant_disbursement_total, greater_than_or_equal_to: 0
 
   def first_disbursement_of_month?
-    last_disbursement = Disbursement.where(merchant:).order(created_at: :desc).first
+    last_disbursement_date = created_at - (merchant.daily_disbursement_frequency? ? 1.day : 1.week)
+
+    last_disbursement = Disbursement.find_by(merchant:, created_at: last_disbursement_date)
     return false unless last_disbursement.present?
 
     last_disbursement.created_at.month != created_at.month
