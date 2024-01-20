@@ -22,6 +22,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_01_20_123556) do
     t.uuid "merchant_id", null: false
     t.decimal "merchant_disbursement_total", precision: 8, scale: 2, default: "0.0", null: false
     t.decimal "orders_fee_sum", precision: 8, scale: 2, default: "0.0", null: false
+    t.decimal "monthly_fee_difference", precision: 8, scale: 2, default: "0.0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["merchant_id"], name: "index_disbursements_on_merchant_id"

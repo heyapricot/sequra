@@ -4,6 +4,7 @@ class CreateDisbursements < ActiveRecord::Migration[7.1]
       t.references :merchant, null: false, foreign_key: true, type: :uuid
       t.decimal :merchant_disbursement_total, precision: 8, scale: 2, null: false, default: 0.0
       t.decimal :orders_fee_sum, precision: 8, scale: 2, null: false, default: 0.0
+      t.decimal :monthly_fee_difference, precision: 8, scale: 2, null: false, default: 0.0
 
       t.timestamps
     end

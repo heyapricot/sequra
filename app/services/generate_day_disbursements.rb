@@ -13,12 +13,15 @@ class GenerateDayDisbursements
       merchant_orders = orders.where(merchant:)
       next if merchant_orders.empty?
 
-      disbursement = Disbursement.create!(merchant:)
+      disbursement = Disbursement.create!(merchant:, created_at: date)
       merchant_orders.update_all(disbursement_id: disbursement.id)
       disbursement.update!(
         merchant_disbursement_total: merchant_disbursement_total(merchant_orders),
         orders_fee_sum: orders_fee_sum(merchant_orders)
       )
+
+      disbursement.generate_minimum_monthly_fee
+
       disbursements << disbursement
     end
 
