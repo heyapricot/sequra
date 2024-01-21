@@ -6,22 +6,27 @@ class GenerateDayDisbursements
   end
 
   def call
-    orders = Order.where(merchant: merchants, created_at: date.beginning_of_day..date.end_of_day)
     disbursements = []
-
+    last_seven_days = (date - 6.days..date)
     merchants.each do |merchant|
-      merchant_orders = orders.where(merchant:)
-      next if merchant_orders.empty?
-
-      disbursement = Disbursement.create!(merchant:, created_at: date)
-      merchant_orders.update_all(disbursement_id: disbursement.id)
-      disbursement.update!(
-        merchant_disbursement_total: merchant_disbursement_total(merchant_orders),
-        orders_fee_sum: orders_fee_sum(merchant_orders)
+      merchant_orders = orders_of_the_week.where(
+        merchant:,
+        created_at: merchant.daily_disbursement_frequency? ? date : last_seven_days
       )
 
-      disbursement.generate_minimum_monthly_fee
+      next if merchant_orders.empty?
 
+      disbursement = nil
+      ActiveRecord::Base.transaction do
+        disbursement = Disbursement.create!(merchant:, created_at: date)
+        merchant_orders.update_all(disbursement_id: disbursement.id)
+        disbursement.update!(
+          merchant_disbursement_total: merchant_disbursement_total(merchant_orders),
+          orders_fee_sum: orders_fee_sum(merchant_orders)
+        )
+      end
+
+      disbursement.generate_minimum_monthly_fee
       disbursements << disbursement
     end
 
@@ -29,6 +34,10 @@ class GenerateDayDisbursements
   end
 
   private
+
+  def orders_of_the_week
+    @orders_of_the_week ||= Order.where(merchant: merchants, created_at: ((date - 6.days).beginning_of_day..date.end_of_day))
+  end
 
   def merchants
     return @merchants if @merchants.present?
