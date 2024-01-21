@@ -50,10 +50,17 @@ To generate the disbursements, run the following command in the rails console:
 - A frontend to generate and display the disbursements table.
 - Given the time constraints, I decided to focus on the core of the problem.
 
+### Querying data
+- The sum of sequra comission, disbursed quantiy and the monthly fee difference is stored in the disbursement table. Speed is gained by having the calculation result stored instead of generated everytime it's required. The tradeoff is that there is the possibility of a mismatch between the stored data and the live data if an order is altered or destroyed. 
+- A method could be called to recalculate and update a disbursement if any of their associated orders is altered to mitigate the scenario mentioned above.
+- Get the data for the table below the command `Disbursement.where(created_at: ("01/01/2023".to_date.."31/12/2023".to_date))`was used to get the data from the year 2023.
+- Once the query was performed, the required columns, merchant_disbursement_total and orders_fee_sum were summed. If the query abve was stored to a variable named `dis`you can run `dis.sum(:merchant_disbursement_total)` to get the sum of the amount disbursed to merchants.
+- To gather the disbursements that involved a minimum monthly fee you can do a sub query like this: `dis.where("monthly_fee_difference > ?", 0)`
+
 
 ## Total disbursements per year
 
 Year | Number of disbursements | Amount disbursed to merchants | Amount of order fees | Number of monthly fees charged (From minimum monthly fee) | Amount of monthly fee charged (From minimum monthly fee) |
 -----|-------------------------|-------------------------------|----------------------|-----------------------------------------------------------|----------------------------------------------------------|
-2022 | 1533                    | 23.639.066,18 €               | 213.540,41 €         | 13                                                        | 329,35 €                                                 |
-2023 | 10247                   | 128.417.712,12 €              | 1.166.665,32 €       | 136                                                       | 3.110,19 €                                               |
+2022 | 1547                    | 37.513.789,25 €               | 338.907,53 €         | 19                                                        | 466,62 €                                                 |
+2023 | 10350                   | 187.418.811,04 €              | 1.698.491,74 €       | 168                                                       | 3.656,09 €                                               |
