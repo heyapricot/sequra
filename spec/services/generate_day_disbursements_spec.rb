@@ -7,6 +7,7 @@ RSpec.describe GenerateDayDisbursements, type: :service do
 
       context "when orders exist for the given merchant and the given date" do
         let(:date) { Date.current }
+        let!(:previous_orders) { (date - 2.days...date).flat_map{ |day| create(:order, merchant:, created_at: day) } }
         let!(:orders) { create_list(:order, 2, merchant:, created_at: date) }
         subject { described_class.new(date).call }
 
@@ -14,8 +15,12 @@ RSpec.describe GenerateDayDisbursements, type: :service do
           expect { subject }.to change { Disbursement.count }.by(1)
         end
 
-        it "associates the orders to the disbursement" do
+        it "associates the orders of the current day to the disbursement" do
           expect(subject.first.orders).to match_array orders
+        end
+
+        it "does not associate orders older than the current day to the disbursement" do
+          expect(subject.first.orders).not_to include previous_orders
         end
 
         it "sets the merchant_disbursement_total to the sum of the orders disbursement_amount" do
