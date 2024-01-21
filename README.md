@@ -1,7 +1,8 @@
 # README
 Author: Alvaro Sanchez
 ## Tools versions
-The project uses Ruby 3.3.0 and Rails 7.1.3
+The project uses Ruby 3.3.0 and Rails 7.1.3. 
+In addition, postgresql version 16 was used while developing. Ignore rails' default Dockerfile.
 ## Setup
 - After extracting the project, change to the sequra directory using your CLI
 - Run `bundle install`
@@ -36,10 +37,18 @@ To generate the disbursements, run the following command in the rails console:
 `GenerateHistoricDisbursements.call`
 
 ## Notes and comments
+### Currency precision
+- While there are recommendations for using the [Money gem](https://rubymoney.github.io/money/), I don't have personal experience with it so I didn't use it. 
+- A money format exists in potgresql but I read multiple recommendations to avoid using it and use the decimal format instead.
+- Following the previous recommendation, I set a default precision of 8 and a scale of 2 for the amount column in the disbursements table. It wasn't until later that I saw orders had more than a million records. Given that Information I would change the precision and scale and have a discussion about what fits the business needs.
+- I also want to foster an agreement for a rounding strategy in calculations like the sequra commission.  
+
 ### Nice to haves
 - Add a rake task to import merchants and orders
 - Create a form to upload and process the merchant and order's CSV files respectively
 - Create a sidekiq job to generate the disbursements everyday before 8:00 UTC
+- A frontend to generate and display the disbursements table.
+- Given the time constraints, I decided to focus on the core of the problem.
 
 
 ## Total disbursements per year
